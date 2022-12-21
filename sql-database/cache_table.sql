@@ -1,5 +1,5 @@
 CREATE TABLE geotiff_cache(
     tiff_id serial primary key,
-    tiff_image raster,
-    tiff_sha_256 uuid
+    tiff_image bytea,
+    tiff_sha_256 bytea
 );
