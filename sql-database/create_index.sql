@@ -1,0 +1,1 @@
+CREATE INDEX sha256_index ON geotiff_cache (tiff_sha_256);
