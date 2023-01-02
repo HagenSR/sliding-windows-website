@@ -2,8 +2,10 @@ from flask import Flask, send_file, Response, request, jsonify
 import json
 import psycopg2
 import base64
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)
 
 credentials = ""
 with open("credentials.json") as fl:
@@ -25,7 +27,7 @@ def check_for_tiff():
     file_sha_256 = request.args.get('file_sha256')
     cursor = conn.cursor()
     cursor.execute("SELECT api_functions.check_for_geotiff(bytea %s)", (file_sha_256,))
-    row = cursor.fetchone()
+    row = cursor.fetchone()[0]
     return jsonify(row)
 
 @app.route("/insert_tiff")
