@@ -11,7 +11,7 @@ conn = psycopg2.connect(host="localhost",
                         port=5432,
                         user= credentials["user"],
                         password= credentials["password"],
-                        database=credentials["database"]) # To remove slash
+                        database=credentials["database"])
 
 cursor = conn.cursor()
 cursor.execute("SELECT api_functions.retrieve_tiff(%s)", (1,))
