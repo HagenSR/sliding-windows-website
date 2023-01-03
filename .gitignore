@@ -1,2 +1,3 @@
 flask-server/credentials.json
 *.pyc
+flask-server/__pycache__/app.cpython-38.pyc
