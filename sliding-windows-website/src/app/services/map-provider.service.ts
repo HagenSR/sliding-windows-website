@@ -1,5 +1,9 @@
 import { Injectable } from '@angular/core';
 import { Map, Layer, CircleMarker, tileLayer, GeoJSON, geoJSON, LatLng, LayerGroup } from 'leaflet';
+import { TiffService } from './tiff.service';
+// import * as leafletGeotiff from 'leaflet-geotiff';
+import geotiffOptions from './geotiff-options';
+// import * as plotty from 'leaflet-geotiff/leaflet-geotiff-plotty';
 
 @Injectable({
   providedIn: 'root'
@@ -9,7 +13,8 @@ export class MapProviderService {
   private map!: Map;
   private currTiffLayer!: Layer | null;
 
-  constructor() { }
+  constructor(private tiffService: TiffService) {
+  }
 
   ngAfterViewInit(): void {
     this.initMap();
@@ -17,6 +22,7 @@ export class MapProviderService {
 
   public initService(): void {
     this.initMap();
+    this.initServices();
   }
 
   private initMap(): void {
@@ -32,5 +38,14 @@ export class MapProviderService {
     });
 
     tiles.addTo(this.map);
+  }
+
+  private initServices(): void {
+    this.tiffService.currentTiff.subscribe((result) => {
+      if(result){
+        // var layer = leafletGeotiff(result?.source, geotiffOptions).addTo(this.map);
+      }
+    })
+
   }
 }
