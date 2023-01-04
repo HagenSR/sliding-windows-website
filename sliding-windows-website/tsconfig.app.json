@@ -11,6 +11,7 @@
   ],
   "include": [
     "src/**/*.d.ts",
-    "decs.d.ts"
+    "src/**/*.d.ts",
+    "leaflet.leaflet-geotiff-2.d.ts"
   ]
 }
