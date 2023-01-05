@@ -28,7 +28,8 @@
               "node_modules/bootstrap/dist/css/bootstrap.css"
             ],
             "scripts": [
-              "node_modules/bootstrap/dist/js/bootstrap.js"
+              "node_modules/bootstrap/dist/js/bootstrap.js",
+              "src/assets/leaflet-geotiff-2/dist/leaflet-geotiff.js"
             ]
           },
           "configurations": {

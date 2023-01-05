@@ -2,7 +2,7 @@ import psycopg2
 import json
 
 byte_string = ""
-with open("result.tif", "rb") as fl:
+with open("4326_nd.geotiff.tif", "rb") as fl:
     byte_string = fl.read()
 
 credentials = ""

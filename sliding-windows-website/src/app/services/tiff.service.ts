@@ -46,7 +46,7 @@ export class TiffService {
     });
   }
 
-  private toArrayBuffer(buf: Uint8Array) {
+  toArrayBuffer(buf: Uint8Array) : ArrayBuffer {
     const ab = new ArrayBuffer(buf.byteLength);
     const view = new Uint8Array(ab);
     for (let i = 0; i < buf.byteLength; ++i) {
