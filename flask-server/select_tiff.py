@@ -14,7 +14,7 @@ conn = psycopg2.connect(host="localhost",
                         database=credentials["database"])
 
 cursor = conn.cursor()
-cursor.execute("SELECT api_functions.retrieve_tiff(%s)", (1,))
+cursor.execute("SELECT api_functions.retrieve_tiff(%s)", (7,))
 row = cursor.fetchone()
 
 with open("out.tif", "wb") as fl:
