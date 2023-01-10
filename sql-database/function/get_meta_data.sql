@@ -1,6 +1,6 @@
 CREATE OR REPLACE FUNCTION api_functions.get_meta_data(tiff_id int) RETURNS TABLE(
         meta_id int,
-        tiff_sha_256 bytea,
+        tiff_sha_256 text,
         tiff_image_id int,
         window_size int,
         created_date timestamp,

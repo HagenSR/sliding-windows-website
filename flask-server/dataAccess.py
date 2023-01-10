@@ -39,14 +39,14 @@ class DataAccess:
 
     def check(self, file_sha_256, win_size, op_id):
         res = None
-        query = "SELECT api_functions.check_for_geotiff(bytea %s, %s, %s)"
+        query = "SELECT api_functions.check_for_geotiff(%s, %s, %s)"
         args = (file_sha_256, win_size, op_id)
         res = self.execute_query(query, args, "fetchone")
-        return res["check_for_geotiff"]
+        return res["check_for_geotiff"] 
 
     def insert(self, file_bytea, hash, win_size, op_id, file_name):
         res = None
-        res = self.execute_query("SELECT api_functions.insert_geotiff(bytea %s, bytea %s, %s, %s, %s)",
+        res = self.execute_query("SELECT api_functions.insert_geotiff(%s, %s, %s, %s, %s)",
                                  (file_bytea, hash, win_size, op_id, file_name), "fetchone")
         return res
 
@@ -63,8 +63,6 @@ class DataAccess:
         res = None
         res = self.execute_query(
             "SELECT (api_functions.get_meta_data(%s)).*", (met_id,), "fetchone")
-        if res:
-            res["tiff_sha_256"] = res["tiff_sha_256"].tobytes().hex()
         return res
 
     def retrieve_tiff(self, img_id):

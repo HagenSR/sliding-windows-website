@@ -1,6 +1,6 @@
 CREATE TABLE image_meta_data(
     meta_id serial primary key,
-    tiff_sha_256 bytea,
+    tiff_sha_256 text,
     tiff_image_id int,
     window_size int,
     created_date timestamp default now(),

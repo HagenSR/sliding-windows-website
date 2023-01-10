@@ -2,7 +2,7 @@
 --DROP FUNCTION IF EXISTS api_functions.insert_geotiff(bytea, bytea, int, int);
 CREATE OR REPLACE FUNCTION api_functions.insert_geotiff(
         image_base64 bytea,
-        image_sha bytea,
+        image_sha text,
         win_size int,
         oper_id int,
         file_name text
@@ -32,4 +32,4 @@ VALUES (
 return image_id;
 END;
 $$;
-ALTER FUNCTION api_functions.insert_geotiff(bytea, bytea, int, int, text) OWNER TO postgres;
+ALTER FUNCTION api_functions.insert_geotiff(bytea, text, int, int, text) OWNER TO postgres;

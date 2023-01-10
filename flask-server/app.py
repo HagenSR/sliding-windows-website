@@ -6,7 +6,7 @@ import hashlib
 from werkzeug.utils import secure_filename
 from windowagg.sliding_window import SlidingWindow
 from dataAccess import DataAccess
-from werkzeug.exceptions import BadRequest, HTTPException
+from werkzeug.exceptions import HTTPException
 
 app = Flask(__name__)
 CORS(app)
@@ -58,7 +58,7 @@ def insert_tiff():
                 hash = hashlib.sha256(fl.read())
             id = dataAccess.check(hash.hexdigest(), win_size, op_id)
             if id:
-                return jsonify(dataAccess.get_meta_data(id["insert_geotiff"]))
+                return jsonify(dataAccess.get_meta_data(id))
             else:
                 new_file_name = execute_sliding_windows(filename, win_size, op_id)
                 byte_string = ""
@@ -66,7 +66,6 @@ def insert_tiff():
                     byte_string = fl.read()
                 id = dataAccess.insert(byte_string, hash.hexdigest(), win_size, op_id, new_file_name)
                 return jsonify(dataAccess.get_meta_data(id["insert_geotiff"]))
-            # return jsonify(insert(file.stream.read()))
         return "File not allowed"
 
 
@@ -101,6 +100,18 @@ def execute_sliding_windows(filePath, win_size, operation):
         # slide_window.auto_plot = self.auto_plot
         slide_window.initialize_dem()
         slide_window.aggregate_dem(win_size)
-        new_file_name = slide_window.dem_slope()
+        if op_id_to_desc[operation] == "dem_slope": 
+            new_file_name = slide_window.dem_slope()
+        elif op_id_to_desc[operation] == "dem_profile": 
+            new_file_name = slide_window.dem_profile()
+        elif op_id_to_desc[operation] == "dem_tangential": 
+            new_file_name = slide_window.dem_tangential()
+        elif op_id_to_desc[operation] == "dem_contour": 
+            new_file_name = slide_window.dem_contour()
+        elif op_id_to_desc[operation] == "dem_proper_profile": 
+            new_file_name = slide_window.dem_proper_profile()
+        elif op_id_to_desc[operation] == "dem_proper_tangential": 
+            new_file_name = slide_window.dem_proper_tangential()
+        else:
+            raise Exception("Invalid operation")
     return new_file_name
-get_meta_data
