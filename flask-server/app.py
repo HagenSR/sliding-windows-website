@@ -6,6 +6,7 @@ import hashlib
 from werkzeug.utils import secure_filename
 from windowagg.sliding_window import SlidingWindow
 from dataAccess import DataAccess
+from werkzeug.exceptions import BadRequest, HTTPException
 
 app = Flask(__name__)
 CORS(app)
@@ -14,6 +15,10 @@ app.config['UPLOAD_FOLDER'] = "./store"
 dataAccess = DataAccess()
 
 op_id_to_desc = dataAccess.get_operations()
+
+@app.errorhandler(HTTPException)
+def handle_exception(e):
+    return jsonify(error=str(e)), 404
 
 @app.route("/")
 def hello_world():
@@ -42,6 +47,7 @@ def insert_tiff():
         op_id = int(request.args.get('op_id'))
         # If the user does not select a file, the browser submits an
         # empty file without a filename.
+        filename = ""
         if file.filename == '':
             return 'No file selected'
         if file and allowed_file(file.filename):
@@ -52,14 +58,14 @@ def insert_tiff():
                 hash = hashlib.sha256(fl.read())
             id = dataAccess.check(hash.hexdigest(), win_size, op_id)
             if id:
-                return jsonify(get_meta_data(id))
+                return jsonify(dataAccess.get_meta_data(id["insert_geotiff"]))
             else:
-                new_file_name = execute_sliding_windows()
+                new_file_name = execute_sliding_windows(filename, win_size, op_id)
                 byte_string = ""
                 with open(new_file_name, "rb") as fl:
                     byte_string = fl.read()
-                id = dataAccess.insert(byte_string, hash.hexdigest(), win_size, op_id)
-                return jsonify(get_meta_data(id))
+                id = dataAccess.insert(byte_string, hash.hexdigest(), win_size, op_id, new_file_name)
+                return jsonify(dataAccess.get_meta_data(id["insert_geotiff"]))
             # return jsonify(insert(file.stream.read()))
         return "File not allowed"
 
@@ -70,7 +76,7 @@ def retrieve_tiff():
     img_id = request.args.get('img_id')
     row = dataAccess.retrieve_tiff(img_id)
     return send_file(
-        io.BytesIO(row[0].tobytes()),
+        io.BytesIO(row["retrieve_tiff"].tobytes()),
         download_name='geotiff.tif',
         mimetype='bytes'
     )
@@ -96,3 +102,5 @@ def execute_sliding_windows(filePath, win_size, operation):
         slide_window.initialize_dem()
         slide_window.aggregate_dem(win_size)
         new_file_name = slide_window.dem_slope()
+    return new_file_name
+get_meta_data

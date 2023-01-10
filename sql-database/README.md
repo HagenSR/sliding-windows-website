@@ -1,0 +1,3 @@
+# Sliding Windows Website
+
+The sql files contained within this directory define the entire database for this website. I'm aware of SQL management tools such as liquidbase but I chose not to use one. Instead, manipulate the SQL files in here and then to create the database run 'bash create_database.sh'. Recreating the database may require dropping the database if you alter a table script, or you can try altering the table manually and then changing the create database script. If you add more files to this directory, be sure to add them to the create_database script.
