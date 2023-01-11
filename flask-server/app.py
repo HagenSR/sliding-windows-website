@@ -3,6 +3,7 @@ import os
 from flask import Flask, send_file, request, jsonify
 from flask_cors import CORS
 import hashlib
+import rasterio
 from werkzeug.utils import secure_filename
 from windowagg.sliding_window import SlidingWindow
 from dataAccess import DataAccess
@@ -45,6 +46,7 @@ def insert_tiff():
         file = request.files['file']
         win_size = int(request.args.get('win_size'))
         op_id = int(request.args.get('op_id'))
+        dtype = request.args.get('dtype')
         # If the user does not select a file, the browser submits an
         # empty file without a filename.
         filename = ""
@@ -57,10 +59,10 @@ def insert_tiff():
             with open(filename, "rb") as fl:
                 hash = hashlib.sha256(fl.read())
             id = dataAccess.check(hash.hexdigest(), win_size, op_id)
-            if id:
+            if False:
                 return jsonify(dataAccess.get_meta_data(id))
             else:
-                new_file_name = execute_sliding_windows(filename, win_size, op_id)
+                new_file_name = execute_sliding_windows(filename, win_size, op_id, dtype)
                 byte_string = ""
                 with open(new_file_name, "rb") as fl:
                     byte_string = fl.read()
@@ -94,9 +96,9 @@ def get_ops():
     return jsonify(res)
 
 
-def execute_sliding_windows(filePath, win_size, operation):
+def execute_sliding_windows(filePath, win_size, operation, dtype : str):
     new_file_name = ""
-    with SlidingWindow(filePath) as slide_window:
+    with SlidingWindow(filePath, dtype=getattr(rasterio, dtype)) as slide_window:
         # slide_window.auto_plot = self.auto_plot
         slide_window.initialize_dem()
         slide_window.aggregate_dem(win_size)
