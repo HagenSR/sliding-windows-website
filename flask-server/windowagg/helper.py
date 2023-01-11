@@ -107,7 +107,7 @@ def create_tif(arr_in, file_name, profile=None, num_aggre=0, pixelSpatialResolut
         'width': np.size(arr_in,1),
         'transform': new_transform,
     })
-    with rasterio.open(file_name, 'w', **new_profile, BIGTIFF=big_tiff) as dst:
+    with rasterio.open(file_name, 'w', **new_profile, BIGTIFF=big_tiff, nodata=0) as dst:
         print('Writing to: ',dst)
         print('with transform: ')
         print(new_transform)

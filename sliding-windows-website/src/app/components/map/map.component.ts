@@ -10,8 +10,7 @@ import { TiffService } from 'src/app/services/tiff.service';
 export class MapComponent implements OnInit {
 
   constructor(private tiffService: TiffService, private mapService: MapProviderService) {
-    tiffService.retrieveTiff("\\x033aaf3eaa13d83123a48ebe11558e38234592e214ee1c83bab74775e7374d54")
-
+    tiffService.retrieveTiff(1)
   }
 
   ngOnInit(): void {

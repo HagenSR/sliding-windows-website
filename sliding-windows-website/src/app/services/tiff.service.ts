@@ -1,10 +1,9 @@
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import GeoTIFF from 'geotiff';
-import { BehaviorSubject, buffer, from, Observable } from 'rxjs';
+import GeoTIFF, { fromBlob } from 'geotiff';
+import { decode } from 'tiff';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
-import { fromArrayBuffer } from 'geotiff';
-import { Buffer } from 'buffer';
 
 const httpOptions = {
   headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
@@ -18,7 +17,9 @@ const httpOptions = {
 })
 export class TiffService {
 
-  public currentTiff: BehaviorSubject<GeoTIFF | null> = new BehaviorSubject<GeoTIFF | null>(null)
+  public uploadedTiff: BehaviorSubject<GeoTIFF | null> = new BehaviorSubject<GeoTIFF | null>(null)
+  public processedTiff: BehaviorSubject<GeoTIFF | null> = new BehaviorSubject<GeoTIFF | null>(null)
+  public jpgOfProcessed: BehaviorSubject<GeoTIFF | null> = new BehaviorSubject<GeoTIFF | null>(null)
 
   constructor(private http: HttpClient) { }
 
@@ -30,23 +31,20 @@ export class TiffService {
     return this.http.get<boolean>(environment.ApiURL + 'check_for_tiff', httpOptions);
   }
 
-  retrieveTiff(tiff_sha256: string): void {
+  retrieveTiff(img_id: number): void {
     var params = new HttpParams();
-    params = params.append("file_sha256", tiff_sha256)
     httpOptions.params = params
-    this.http.get<string>(environment.ApiURL + 'retrieve_tiff', httpOptions).subscribe((base64Tiff) => {
-      let enc = new TextEncoder();
-      let uintbuff = enc.encode(atob(base64Tiff));
-      let arrayBuffer = this.toArrayBuffer(uintbuff);
-      fromArrayBuffer(arrayBuffer).then((newGeoTiff) => {
-        this.currentTiff.next(newGeoTiff);
+    fetch(environment.ApiURL + 'retrieve_tiff?img_id=' + img_id).then(res => res.blob()).then((res) => {
+      this.convertToJPG(res);
+      fromBlob(res).then((newGeoTiff) => {
+        this.processedTiff.next(newGeoTiff);
       }).catch((err) => {
         console.log(err)
       })
-    });
+    })
   }
 
-  toArrayBuffer(buf: Uint8Array) : ArrayBuffer {
+  toArrayBuffer(buf: Uint16Array): ArrayBuffer {
     const ab = new ArrayBuffer(buf.byteLength);
     const view = new Uint8Array(ab);
     for (let i = 0; i < buf.byteLength; ++i) {
@@ -55,5 +53,10 @@ export class TiffService {
     return ab;
   }
 
-
+  convertToJPG(blob: Blob) {
+    blob.arrayBuffer().then((arrBuf) => {
+      let res = decode(arrBuf)
+      console.log("huh")
+    })
+  }
 }
