@@ -15,7 +15,7 @@ app.config['UPLOAD_FOLDER'] = "./store"
 
 dataAccess = DataAccess()
 
-op_id_to_desc = dataAccess.get_operations()
+op_id_to_desc = DataAccess.arrayToDict(dataAccess.get_operations())
 
 @app.errorhandler(HTTPException)
 def handle_exception(e):
@@ -42,7 +42,7 @@ def insert_tiff():
     if request.method == 'POST':
         # check if the post request has the file part
         if 'file' not in request.files:
-            return 'No file part'
+            return 'No file part', 400
         file = request.files['file']
         win_size = int(request.args.get('win_size'))
         op_id = int(request.args.get('op_id'))
@@ -51,7 +51,7 @@ def insert_tiff():
         # empty file without a filename.
         filename = ""
         if file.filename == '':
-            return 'No file selected'
+            return 'No file selected', 400
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
@@ -67,8 +67,8 @@ def insert_tiff():
                 with open(new_file_name, "rb") as fl:
                     byte_string = fl.read()
                 id = dataAccess.insert(byte_string, hash.hexdigest(), win_size, op_id, new_file_name)
-                return jsonify(dataAccess.get_meta_data(id["insert_geotiff"]))
-        return "File not allowed"
+                return jsonify(dataAccess.get_meta_data(id["insert_geotiff"])), 200
+        return "File not allowed", 400
 
 
 # Returns tiff image as array of bytes

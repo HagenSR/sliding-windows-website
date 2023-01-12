@@ -1,1 +1,70 @@
-<p>left-div works!</p>
+<h2>File Upload</h2>
+<p>Input a geotiff file in CRS 4326 to upload</p>
+<form [formGroup]="fileUploadForm" (ngSubmit)="onSubmit()">
+    <div class="row">
+        <label for="file" class="col">
+            File upload
+        </label>
+        <input type=file id=file class="col" formControlName="file">
+    </div>
+    <div class="row">
+        <label for="windowSize" class="col">
+            Window size n where 2^n
+        </label>
+        <input id="windowSize" type="number" formControlName="windowSize" class="col">
+    </div>
+    <div class="row">
+        <label for="operation" class="col">
+            Operation
+        </label>
+        <select #cricket (change)="update($event)" class="col">
+            <option value="default">----</option>
+            <option *ngFor="let op of operationService.operations" [value]="op.op_id">
+                {{op.op_desc}}
+            </option>
+        </select>
+    </div>
+    <div class="row">
+        <label for="dtype" class="col">
+            dtype
+        </label>
+        <select #cricket (change)="update($event)" class="col">
+            <option value="int8">
+                int8
+            </option>
+            <option value="int32">
+                int16
+            </option>
+            <option value="int32">
+                int32
+            </option>
+            <option value="int64">
+                int64
+            </option>
+            <option value="ubyte">
+                ubyte
+            </option>
+            <option value="uint8">
+                uint8
+            </option>
+            <option value="uint16">
+                uint16
+            </option>
+            <option value="uint32">
+                uint32
+            </option>
+            <option value="uint32">
+                uint64
+            </option>
+            <option value="float32">
+                float32
+            </option>
+            <option value="float64">
+                float64
+            </option>
+        </select>
+    </div>
+    <div class="row">
+        <input type=submit value=Upload class="col">
+    </div>
+</form>

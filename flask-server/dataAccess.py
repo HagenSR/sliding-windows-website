@@ -51,13 +51,9 @@ class DataAccess:
         return res
 
     def get_operations(self):
-        rtn = None
         res = self.execute_query(
             "SELECT (api_functions.get_operations()).*", (), "fetchall")
-        rtn = {}
-        for row in res:
-            rtn[row["op_id"]] = row["op_desc"]
-        return rtn
+        return res
 
     def get_meta_data(self, met_id):
         res = None
@@ -70,3 +66,9 @@ class DataAccess:
         res = self.execute_query(
             "SELECT api_functions.retrieve_tiff(%s)", (img_id,), "fetchone")
         return res
+
+    def arrayToDict(res):
+        rtn = {}
+        for row in res:
+            rtn[row["op_id"]] = row["op_desc"]
+        return rtn

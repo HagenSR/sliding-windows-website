@@ -2,8 +2,9 @@ import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import GeoTIFF, { fromBlob } from 'geotiff';
 import { decode } from 'tiff';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, Observable, of } from 'rxjs';
 import { environment } from 'src/environments/environment';
+import { TiffMetaData } from '../models/tiff_meta_data';
 
 const httpOptions = {
   headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
@@ -17,9 +18,8 @@ const httpOptions = {
 })
 export class TiffService {
 
-  public uploadedTiff: BehaviorSubject<GeoTIFF | null> = new BehaviorSubject<GeoTIFF | null>(null)
+  public tiffMetaData: BehaviorSubject<TiffMetaData | null> = new BehaviorSubject<TiffMetaData | null>(null);
   public processedTiff: BehaviorSubject<GeoTIFF | null> = new BehaviorSubject<GeoTIFF | null>(null)
-  public jpgOfProcessed: BehaviorSubject<GeoTIFF | null> = new BehaviorSubject<GeoTIFF | null>(null)
 
   constructor(private http: HttpClient) { }
 
@@ -35,14 +35,42 @@ export class TiffService {
     var params = new HttpParams();
     httpOptions.params = params
     fetch(environment.ApiURL + 'retrieve_tiff?img_id=' + img_id).then(res => res.blob()).then((res) => {
-      this.convertToJPG(res);
-      fromBlob(res).then((newGeoTiff) => {
-        this.processedTiff.next(newGeoTiff);
-      }).catch((err) => {
-        console.log(err)
-      })
+      if (res) {
+        // this.convertToJPG(res);
+        fromBlob(res).then((newGeoTiff) => {
+          this.processedTiff.next(newGeoTiff);
+        }).catch((err) => {
+          console.log(err)
+        })
+      } else {
+        console.log("error, no geotiff")
+      }
+
     })
   }
+
+  insertTiff(file: any, win_size: number, op_id: number, dtype: string): Promise<Boolean> {
+    return new Promise(() => {
+      var params = new HttpParams();
+      params = params.append("win_size", win_size);
+      params = params.append("op_id", op_id);
+      params = params.append("dtype", dtype);
+      httpOptions.params = params
+      this.http.post<TiffMetaData>(environment.ApiURL + 'insert_tiff', file, httpOptions).subscribe({
+        next: (res) => {
+          this.tiffMetaData.next(res);
+          return true;
+        }
+        ,
+        error: (err) => {
+          alert("Enter agg data failed: " + err.error);
+          return false;
+        }
+      })
+    });
+  }
+
+
 
   toArrayBuffer(buf: Uint16Array): ArrayBuffer {
     const ab = new ArrayBuffer(buf.byteLength);
@@ -53,10 +81,10 @@ export class TiffService {
     return ab;
   }
 
-  convertToJPG(blob: Blob) {
-    blob.arrayBuffer().then((arrBuf) => {
-      let res = decode(arrBuf)
-      console.log("huh")
-    })
-  }
+  // convertToJPG(blob: Blob) {
+  //   blob.arrayBuffer().then((arrBuf) => {
+  //     let res = decode(arrBuf)
+  //     console.log("huh")
+  //   })
+  // }
 }
