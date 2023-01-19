@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import * as L from 'leaflet';
 import { TiffService } from './tiff.service';
 import { fromArrayBuffer } from 'geotiff';
+import { ScriptService } from './script.service';
 
 @Injectable({
   providedIn: 'root'
@@ -11,8 +12,8 @@ export class MapProviderService {
   private map!: L.Map;
   private currTiffLayer!: L.Layer | null;
 
-  constructor(private tiffService: TiffService) {
-  
+  constructor(private tiffService: TiffService, private scriptService: ScriptService) {
+
   }
 
   ngAfterViewInit(): void {
@@ -21,7 +22,7 @@ export class MapProviderService {
 
   public initService(): void {
     this.initMap();
-    this.initServices();
+    this.initScripts();
   }
 
   private initMap(): void {
@@ -39,14 +40,29 @@ export class MapProviderService {
     tiles.addTo(this.map);
   }
 
-  private initServices(): void {
-    this.tiffService.processedTiff.subscribe((result) => {
-      if(result){
-        console.log(result)
-        //LeafletGeotiff.leafletGeotiff(result?.source, geotiffOptions).addTo(this.map);
-        //this.options.arrayBuffer = result?.source;
-      }
-    })
+  private initScripts() {
+    this.scriptService.load('leaflet-geotiff').then(data => {
+      this.scriptService.load("leaflet-geotiff-plotty").then((res) => {
+        this.initServices();
 
+      })
+
+    }).catch(error => console.log(error));
+
+  }
+
+  private initServices(): void {
+    this.tiffService.url.subscribe((res) => {
+      L.leafletGeotiff(res!, {
+        renderer: L.LeafletGeotiff.plotty({
+          arrowSize: 20
+        })
+      }).addTo(this.map);
+      this.tiffService.processedTiff.value?.getImage(0).then((res) => {
+        let bounds = res.getBoundingBox()
+        let ltlng: L.LatLngBoundsExpression = [[bounds[1], bounds[0]], [bounds[3], bounds[2]]]
+        this.map.fitBounds(ltlng)
+      })
+    })
   }
 }

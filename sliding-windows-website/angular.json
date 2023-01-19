@@ -20,7 +20,9 @@
             "tsConfig": "tsconfig.app.json",
             "assets": [
               "src/favicon.ico",
-              "src/assets"
+              "src/assets",
+              "src/assets/leaflet-geotiff.js",
+              "src/assets/Cat.jpg"
             ],
             "styles": [
               "src/styles.css",

@@ -1,7 +1,6 @@
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import GeoTIFF, { fromBlob } from 'geotiff';
-import { decode } from 'tiff';
 import { BehaviorSubject, Observable, of } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { TiffMetaData } from '../models/tiff_meta_data';
@@ -20,8 +19,15 @@ export class TiffService {
 
   public tiffMetaData: BehaviorSubject<TiffMetaData | null> = new BehaviorSubject<TiffMetaData | null>(null);
   public processedTiff: BehaviorSubject<GeoTIFF | null> = new BehaviorSubject<GeoTIFF | null>(null)
+  public url: BehaviorSubject<string | null> = new BehaviorSubject<string | null>(null)
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {
+    this.tiffMetaData.subscribe((res) => {
+      if (this.tiffMetaData.value?.tiff_image_id) {
+        this.retrieveTiff(this.tiffMetaData.value?.tiff_image_id);
+      }
+    })
+  }
 
 
   checkIfTiffExists(tiff_sha256: string): Observable<boolean> {
@@ -36,6 +42,7 @@ export class TiffService {
     httpOptions.params = params
     fetch(environment.ApiURL + 'retrieve_tiff?img_id=' + img_id).then(res => res.blob()).then((res) => {
       if (res) {
+        this.url.next(environment.ApiURL + 'retrieve_tiff?img_id=' + img_id)
         // this.convertToJPG(res);
         fromBlob(res).then((newGeoTiff) => {
           this.processedTiff.next(newGeoTiff);
@@ -52,9 +59,9 @@ export class TiffService {
   insertTiff(file: File, win_size: number, op_id: number, dtype: string): Promise<Boolean> {
     return new Promise(() => {
       const httpOptions = {
-        headers: new HttpHeaders({'enctype': 'multipart/form-data' }),
+        headers: new HttpHeaders({ 'enctype': 'multipart/form-data' }),
         params: {
-      
+
         }
       };
       var params = new HttpParams();
@@ -71,7 +78,7 @@ export class TiffService {
         }
         ,
         error: (err) => {
-          alert("Enter agg data failed: " + err.error);
+          alert("Upload tiff file failed: " + err.error);
           return false;
         }
       })
