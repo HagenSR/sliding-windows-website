@@ -29,7 +29,13 @@
             ],
             "scripts": [
               "node_modules/bootstrap/dist/js/bootstrap.js"
-            ]
+            ],
+            "allowedCommonJsDependencies": [
+              "leaflet",
+              "web-worker",
+              "xml-utils/get-attribute.js",
+              "xml-utils/find-tags-by-name.js"
+           ]
           },
           "configurations": {
             "production": {

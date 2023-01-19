@@ -5,30 +5,50 @@
         <label for="file" class="col">
             File upload
         </label>
-        <input type=file id=file class="col" formControlName="file">
+        <input type=file id=file class="col" formControlName="file" (change)="onFileSelected($event)">
+        <div *ngIf="fileUploadForm.controls.file.invalid && (fileUploadForm.controls.file.dirty 
+        || fileUploadForm.controls.file.touched)" class="alert alert-danger">
+            <div *ngIf="fileUploadForm.controls.file.errors?.['required']">
+                File is required.
+            </div>
+        </div>
     </div>
     <div class="row">
         <label for="windowSize" class="col">
             Window size n where 2^n
         </label>
         <input id="windowSize" type="number" formControlName="windowSize" class="col">
+        <div *ngIf="fileUploadForm.controls.windowSize.invalid && (fileUploadForm.controls.windowSize.dirty 
+        || fileUploadForm.controls.windowSize.touched)" class="alert alert-danger">
+            <div *ngIf="fileUploadForm.controls.windowSize.errors?.['required']">
+                WindowSize is required.
+            </div>
+            <div *ngIf="fileUploadForm.controls.windowSize.errors?.['min']">
+                WindowSize must be greater than 0
+            </div>
+        </div>
     </div>
     <div class="row">
         <label for="operation" class="col">
             Operation
         </label>
-        <select #cricket (change)="update($event)" class="col">
-            <option value="default">----</option>
+        <select id="operation" class="col" formControlName="operation">
             <option *ngFor="let op of operationService.operations" [value]="op.op_id">
                 {{op.op_desc}}
             </option>
         </select>
+        <div *ngIf="fileUploadForm.controls.operation.invalid && (fileUploadForm.controls.operation.dirty 
+        || fileUploadForm.controls.operation.touched)" class="alert alert-danger">
+            <div *ngIf="fileUploadForm.controls.operation.errors?.['required']">
+                operation is required.
+            </div>
+        </div>
     </div>
     <div class="row">
         <label for="dtype" class="col">
             dtype
         </label>
-        <select #cricket (change)="update($event)" class="col">
+        <select id="dtype" class="col" formControlName="dtype">
             <option value="int8">
                 int8
             </option>
@@ -63,6 +83,12 @@
                 float64
             </option>
         </select>
+        <div *ngIf="fileUploadForm.controls.dtype.invalid && (fileUploadForm.controls.dtype.dirty 
+        || fileUploadForm.controls.dtype.touched)" class="alert alert-danger">
+            <div *ngIf="fileUploadForm.controls.dtype.errors?.['required']">
+                dtype is required.
+            </div>
+        </div>
     </div>
     <div class="row">
         <input type=submit value=Upload class="col">

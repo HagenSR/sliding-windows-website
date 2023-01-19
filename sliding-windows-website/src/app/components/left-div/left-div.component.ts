@@ -11,22 +11,29 @@ import { TiffService } from 'src/app/services/tiff.service';
 })
 export class LeftDivComponent implements OnInit {
   fileUploadForm = new FormGroup({
-    file: new FormControl('', [
+    file: new FormControl<File | null>(null, [
       Validators.required,
     ]),
-    windowSize: new FormControl(1),
-    operation: new FormControl(1, Validators.required),
-    dtype: new FormControl('int8', Validators.required)
+    windowSize: new FormControl<number | null>(null,[
+      Validators.required,
+      Validators.min(1)
+    ]),
+    operation: new FormControl<number | null>(null, [Validators.required]),
+    dtype: new FormControl<string>('int8', [Validators.required])
   });
-  selected: Operation | undefined;
 
   constructor(private formBuilder: FormBuilder, public operationService: OperationsService, public tiffService: TiffService) { }
 
   ngOnInit(): void {
   }
 
-  update(e: any) {
-    this.selected = e.target.value
+  onFileSelected(event: any) {
+
+    const file: File = event.target.files[0];
+
+    if (file) {
+      this.fileUploadForm.controls.file.setValue(file);
+    }
   }
 
   // On file Select
@@ -36,12 +43,12 @@ export class LeftDivComponent implements OnInit {
 
   onSubmit() {
     if (this.fileUploadForm.invalid) {
-      alert("Cannot insert invalid data. Please read the advice to the left of the input boxes")
+      alert("Cannot insert invalid data. Please read the advice below of the input boxes")
     } else {
       if (!window.confirm("Are you sure you want to submit? This cannot be undone")) {
         return
       }
-      this.tiffService.insertTiff(this.fileUploadForm.get("file")!.value, this.fileUploadForm.get("windowSize")!.value!,
+      this.tiffService.insertTiff(this.fileUploadForm.get("file")!.value!, this.fileUploadForm.get("windowSize")!.value!,
         this.fileUploadForm.get("operation")!.value!, this.fileUploadForm.get("dtype")!.value!).then(res => console.log(this.tiffService.tiffMetaData.value))
     }
   }

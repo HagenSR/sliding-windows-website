@@ -49,14 +49,22 @@ export class TiffService {
     })
   }
 
-  insertTiff(file: any, win_size: number, op_id: number, dtype: string): Promise<Boolean> {
+  insertTiff(file: File, win_size: number, op_id: number, dtype: string): Promise<Boolean> {
     return new Promise(() => {
+      const httpOptions = {
+        headers: new HttpHeaders({'enctype': 'multipart/form-data' }),
+        params: {
+      
+        }
+      };
       var params = new HttpParams();
       params = params.append("win_size", win_size);
       params = params.append("op_id", op_id);
       params = params.append("dtype", dtype);
+      const formData = new FormData();
+      formData.append("file", file, file.name);
       httpOptions.params = params
-      this.http.post<TiffMetaData>(environment.ApiURL + 'insert_tiff', file, httpOptions).subscribe({
+      this.http.post<TiffMetaData>(environment.ApiURL + 'insert_tiff', formData, httpOptions).subscribe({
         next: (res) => {
           this.tiffMetaData.next(res);
           return true;
