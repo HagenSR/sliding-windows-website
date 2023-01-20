@@ -1,8 +1,7 @@
 import { Injectable } from '@angular/core';
 import * as L from 'leaflet';
 import { TiffService } from './tiff.service';
-import { fromArrayBuffer } from 'geotiff';
-import { ScriptService } from './script.service';
+import 'sean-leaflet-geotiff-2'
 
 @Injectable({
   providedIn: 'root'
@@ -12,8 +11,7 @@ export class MapProviderService {
   private map!: L.Map;
   private currTiffLayer!: L.Layer | null;
 
-  constructor(private tiffService: TiffService, private scriptService: ScriptService) {
-
+  constructor(private tiffService: TiffService) {
   }
 
   ngAfterViewInit(): void {
@@ -22,7 +20,7 @@ export class MapProviderService {
 
   public initService(): void {
     this.initMap();
-    this.initScripts();
+    this.initServices();
   }
 
   private initMap(): void {
@@ -40,29 +38,24 @@ export class MapProviderService {
     tiles.addTo(this.map);
   }
 
-  private initScripts() {
-    this.scriptService.load('leaflet-geotiff').then(data => {
-      this.scriptService.load("leaflet-geotiff-plotty").then((res) => {
-        this.initServices();
-
-      })
-
-    }).catch(error => console.log(error));
-
-  }
 
   private initServices(): void {
     this.tiffService.url.subscribe((res) => {
-      L.leafletGeotiff(res!, {
-        renderer: L.LeafletGeotiff.plotty({
-          arrowSize: 20
+      if (res) {
+        L.leafletGeotiff(res!, {
+          renderer: L.LeafletGeotiff.plotty({
+            displayMin: 0,
+            displayMax: 256,
+            colorScale: "greens",
+          })
+        }).addTo(this.map);
+        this.tiffService.processedTiff.value?.getImage(0).then((res) => {
+          let bounds = res.getBoundingBox()
+          let ltlng: L.LatLngBoundsExpression = [[bounds[1], bounds[0]], [bounds[3], bounds[2]]]
+          this.map.fitBounds(ltlng)
         })
-      }).addTo(this.map);
-      this.tiffService.processedTiff.value?.getImage(0).then((res) => {
-        let bounds = res.getBoundingBox()
-        let ltlng: L.LatLngBoundsExpression = [[bounds[1], bounds[0]], [bounds[3], bounds[2]]]
-        this.map.fitBounds(ltlng)
-      })
+      }
+
     })
   }
 }
