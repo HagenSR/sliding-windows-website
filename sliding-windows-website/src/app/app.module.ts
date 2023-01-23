@@ -8,13 +8,15 @@ import { MapComponent } from './components/map/map.component';
 import { LeftDivComponent } from './components/left-div/left-div.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { FileUploadComponent } from './components/left-div/components/file-upload/file-upload.component';
+import { FileDownloadComponent } from './components/left-div/components/file-download/file-download.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     MapComponent,
     LeftDivComponent,
-    FileUploadComponent
+    FileUploadComponent,
+    FileDownloadComponent
   ],
   imports: [
     BrowserModule,
