@@ -7,12 +7,14 @@ import { HttpClientModule } from '@angular/common/http';
 import { MapComponent } from './components/map/map.component';
 import { LeftDivComponent } from './components/left-div/left-div.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FileUploadComponent } from './components/left-div/components/file-upload/file-upload.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     MapComponent,
-    LeftDivComponent
+    LeftDivComponent,
+    FileUploadComponent
   ],
   imports: [
     BrowserModule,

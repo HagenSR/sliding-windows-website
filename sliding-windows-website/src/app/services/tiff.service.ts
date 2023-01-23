@@ -23,8 +23,8 @@ export class TiffService {
 
   constructor(private http: HttpClient) {
     this.tiffMetaData.subscribe((res) => {
-      if (this.tiffMetaData.value?.tiff_image_id) {
-        this.retrieveTiff(this.tiffMetaData.value?.tiff_image_id);
+      if (res?.tiff_image_id) {
+        this.retrieveTiff(res.tiff_image_id);
       }
     })
   }
@@ -41,11 +41,10 @@ export class TiffService {
     var params = new HttpParams();
     httpOptions.params = params
     fetch(environment.ApiURL + 'retrieve_tiff?img_id=' + img_id).then(res => res.blob()).then((res) => {
-      if (res) {
-        this.url.next(environment.ApiURL + 'retrieve_tiff?img_id=' + img_id)
-        // this.convertToJPG(res);
+      if (res) {        // this.convertToJPG(res);
         fromBlob(res).then((newGeoTiff) => {
           this.processedTiff.next(newGeoTiff);
+          this.url.next(environment.ApiURL + 'retrieve_tiff?img_id=' + img_id)
         }).catch((err) => {
           console.log(err)
         })

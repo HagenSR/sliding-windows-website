@@ -59,7 +59,7 @@ def insert_tiff():
             with open(filename, "rb") as fl:
                 hash = hashlib.sha256(fl.read())
             id = dataAccess.check(hash.hexdigest(), win_size, op_id)
-            if False:
+            if id:
                 return jsonify(dataAccess.get_meta_data(id))
             else:
                 new_file_name = execute_sliding_windows(filename, win_size, op_id, dtype)

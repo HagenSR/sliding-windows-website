@@ -47,6 +47,7 @@ export class MapProviderService {
             displayMin: 0,
             displayMax: 256,
             colorScale: "greens",
+            useWorker: true
           })
         }).addTo(this.map);
         this.tiffService.processedTiff.value?.getImage(0).then((res) => {
