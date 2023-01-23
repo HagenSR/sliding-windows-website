@@ -48,10 +48,10 @@ export class TiffService {
           this.processedTiff.next(newGeoTiff);
           this.url.next(environment.ApiURL + 'retrieve_tiff?img_id=' + img_id)
         }).catch((err) => {
-          console.log(err)
+          alert(err)
         })
       } else {
-        console.log("error, no geotiff")
+        alert("error, no geotiff")
       }
 
     })
@@ -76,10 +76,9 @@ export class TiffService {
         next: (res) => {
           this.tiffMetaData.next(res);
           return true;
-        }
-        ,
+        },
         error: (err) => {
-          alert("Upload tiff file failed: " + err.error);
+          alert("Upload tiff file failed: " + err.error.error);
           return false;
         }
       })

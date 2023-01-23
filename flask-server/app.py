@@ -17,7 +17,7 @@ dataAccess = DataAccess()
 
 op_id_to_desc = DataAccess.arrayToDict(dataAccess.get_operations())
 
-@app.errorhandler(HTTPException)
+@app.errorhandler(Exception)
 def handle_exception(e):
     return jsonify(error=str(e)), 404
 
@@ -50,25 +50,29 @@ def insert_tiff():
         # If the user does not select a file, the browser submits an
         # empty file without a filename.
         filename = ""
+        meta_data_to_return = "File not allowed", 400
         if file.filename == '':
             return 'No file selected', 400
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            filename = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            file.save(filename)
             hash = ""
             with open(filename, "rb") as fl:
                 hash = hashlib.sha256(fl.read())
             id = dataAccess.check(hash.hexdigest(), win_size, op_id)
             if id:
-                return jsonify(dataAccess.get_meta_data(id))
+                meta_data_to_return = jsonify(dataAccess.get_meta_data(id)), 200
             else:
                 new_file_name = execute_sliding_windows(filename, win_size, op_id, dtype)
                 byte_string = ""
                 with open(new_file_name, "rb") as fl:
                     byte_string = fl.read()
                 id = dataAccess.insert(byte_string, hash.hexdigest(), win_size, op_id, new_file_name)
-                return jsonify(dataAccess.get_meta_data(id["insert_geotiff"])), 200
-        return "File not allowed", 400
+                os.remove(new_file_name)
+                meta_data_to_return = jsonify(dataAccess.get_meta_data(id["insert_geotiff"])), 200
+        os.remove(filename)
+        return meta_data_to_return
 
 
 # Returns tiff image as array of bytes
