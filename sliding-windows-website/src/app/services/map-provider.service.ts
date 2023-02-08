@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import * as L from 'leaflet';
 import { TiffService } from './tiff.service';
 import 'sean-leaflet-geotiff-2'
+import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -40,9 +41,10 @@ export class MapProviderService {
 
 
   private initServices(): void {
-    this.tiffService.url.subscribe((res) => {
+    this.tiffService.tiffMetaData.subscribe((res) => {
       if (res) {
-        L.leafletGeotiff(res!, {
+        let url = environment.ApiURL + 'retrieve_tiff?img_id=' + res.tiff_image_id;
+        L.leafletGeotiff(url!, {
           renderer: L.LeafletGeotiff.plotty({
             displayMin: 0,
             displayMax: 256,
@@ -50,11 +52,8 @@ export class MapProviderService {
             useWorker: true
           })
         }).addTo(this.map);
-        this.tiffService.processedTiff.value?.getImage(0).then((res) => {
-          let bounds = res.getBoundingBox()
-          let ltlng: L.LatLngBoundsExpression = [[bounds[1], bounds[0]], [bounds[3], bounds[2]]]
-          this.map.fitBounds(ltlng)
-        })
+        let ltlng: L.LatLngBoundsExpression = [[res.min_y, res.min_x], [res.max_y, res.max_x]]
+        this.map.fitBounds(ltlng)
       }
 
     })

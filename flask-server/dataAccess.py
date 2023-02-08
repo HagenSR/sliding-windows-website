@@ -44,10 +44,10 @@ class DataAccess:
         res = self.execute_query(query, args, "fetchone")
         return res["check_for_geotiff"] 
 
-    def insert(self, file_bytea, hash, win_size, op_id, file_name):
+    def insert(self, file_bytea, hash, win_size, op_id, file_name, bounds):
         res = None
-        res = self.execute_query("SELECT api_functions.insert_geotiff(%s, %s, %s, %s, %s)",
-                                 (file_bytea, hash, win_size, op_id, file_name), "fetchone")
+        res = self.execute_query("SELECT api_functions.insert_geotiff(%s, %s, %s, %s, %s, %s, %s, %s, %s)",
+                                 (file_bytea, hash, win_size, op_id, file_name, bounds.left, bounds.bottom, bounds.right, bounds.top), "fetchone")
         return res
 
     def get_operations(self):

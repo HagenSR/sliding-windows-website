@@ -19,8 +19,6 @@ export class TiffService {
 
   public tiffMetaData: BehaviorSubject<TiffMetaData | null> = new BehaviorSubject<TiffMetaData | null>(null);
   public rawProcessedBlob: BehaviorSubject<Blob | null> = new BehaviorSubject<Blob | null>(null)
-  public processedTiff: BehaviorSubject<GeoTIFF | null> = new BehaviorSubject<GeoTIFF | null>(null)
-  public url: BehaviorSubject<string | null> = new BehaviorSubject<string | null>(null)
 
   constructor(private http: HttpClient) {
     this.tiffMetaData.subscribe((res) => {
@@ -44,12 +42,6 @@ export class TiffService {
     fetch(environment.ApiURL + 'retrieve_tiff?img_id=' + img_id).then(res => res.blob()).then((res) => {
       if (res) {
         this.rawProcessedBlob.next(res)
-        fromBlob(res).then((newGeoTiff) => {
-          this.processedTiff.next(newGeoTiff);
-          this.url.next(environment.ApiURL + 'retrieve_tiff?img_id=' + img_id)
-        }).catch((err) => {
-          alert(err)
-        })
       } else {
         alert("error, no geotiff")
       }

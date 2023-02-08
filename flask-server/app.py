@@ -64,11 +64,11 @@ def insert_tiff():
             if id:
                 meta_data_to_return = jsonify(dataAccess.get_meta_data(id)), 200
             else:
-                new_file_name = execute_sliding_windows(filename, win_size, op_id, dtype)
+                new_file_name, bounds = execute_sliding_windows(filename, win_size, op_id, dtype)
                 byte_string = ""
                 with open(new_file_name, "rb") as fl:
                     byte_string = fl.read()
-                id = dataAccess.insert(byte_string, hash.hexdigest(), win_size, op_id, new_file_name)
+                id = dataAccess.insert(byte_string, hash.hexdigest(), win_size, op_id, new_file_name, bounds)
                 os.remove(new_file_name)
                 meta_data_to_return = jsonify(dataAccess.get_meta_data(id["insert_geotiff"])), 200
         os.remove(filename)
@@ -120,4 +120,4 @@ def execute_sliding_windows(filePath, win_size, operation, dtype : str):
             new_file_name = slide_window.dem_proper_tangential()
         else:
             raise Exception("Invalid operation")
-    return new_file_name
+    return new_file_name, slide_window._img.bounds

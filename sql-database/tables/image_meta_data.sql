@@ -6,5 +6,9 @@ CREATE TABLE image_meta_data(
     created_date timestamp default now(),
     last_accessed timestamp default now(),
     sliding_windows_operation int references sliding_windows_operations(op_id),
-    file_name text
+    file_name text, 
+    min_x double precision,
+    min_y double precision,
+    max_x double precision,
+    max_y double precision
 );

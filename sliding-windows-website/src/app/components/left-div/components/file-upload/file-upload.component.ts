@@ -47,9 +47,6 @@ export class FileUploadComponent implements OnInit {
     if (this.fileUploadForm.invalid) {
       alert("Cannot insert invalid data. Please read the advice below of the input boxes")
     } else {
-      if (!window.confirm("Are you sure you want to submit? This cannot be undone")) {
-        return
-      }
       this.tiffService.insertTiff(this.fileUploadForm.get("file")!.value!, this.fileUploadForm.get("windowSize")!.value!,
         this.fileUploadForm.get("operation")!.value!, this.fileUploadForm.get("dtype")!.value!).then(res => console.log(this.tiffService.tiffMetaData.value))
     }

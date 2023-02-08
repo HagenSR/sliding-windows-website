@@ -7,4 +7,8 @@ export interface TiffMetaData {
     tiff_image_id: number,
     tiff_sha_256: string,
     window_size: number,
+    min_x: number,
+    min_y: number,
+    max_x: number,
+    max_y: number
 }
