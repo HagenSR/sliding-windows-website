@@ -44,14 +44,19 @@ export class MapProviderService {
     this.tiffService.tiffMetaData.subscribe((res) => {
       if (res) {
         let url = environment.ApiURL + 'retrieve_tiff?img_id=' + res.tiff_image_id;
-        L.leafletGeotiff(url!, {
+        let newLayer = L.leafletGeotiff(url!, {
           renderer: L.LeafletGeotiff.plotty({
             displayMin: 0,
             displayMax: 256,
             colorScale: "greens",
             useWorker: true
           })
-        }).addTo(this.map);
+        });
+        if(this.currTiffLayer){
+          this.map.removeLayer(this.currTiffLayer)
+        }
+        this.map.addLayer(newLayer)
+        this.currTiffLayer = newLayer
         let ltlng: L.LatLngBoundsExpression = [[res.min_y, res.min_x], [res.max_y, res.max_x]]
         this.map.fitBounds(ltlng)
       }
