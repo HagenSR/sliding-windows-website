@@ -59,6 +59,7 @@ class DataAccess:
         res = None
         res = self.execute_query(
             "SELECT (api_functions.get_meta_data(%s)).*", (met_id,), "fetchone")
+        res["bounding_box"] = json.loads(res["bounding_box"])
         return res
 
     def retrieve_tiff(self, img_id):

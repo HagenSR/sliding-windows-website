@@ -1,5 +1,7 @@
 CREATE DATABASE sliding_windows_website;
-CREATE EXTENSION postgis;
--- enable raster support (for 3+)
+\connect sliding_windows_website;
+CREATE EXTENSION IF NOT EXISTS postgis WITH SCHEMA public;
 CREATE EXTENSION postgis_raster;
 CREATE EXTENSION pgcrypto;
+
+

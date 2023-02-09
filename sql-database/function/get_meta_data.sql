@@ -1,3 +1,5 @@
+
+--DROP FUNCTION api_functions.get_meta_data(int);
 CREATE OR REPLACE FUNCTION api_functions.get_meta_data(tiff_id int) RETURNS TABLE(
         meta_id int,
         tiff_sha_256 text,
@@ -7,10 +9,7 @@ CREATE OR REPLACE FUNCTION api_functions.get_meta_data(tiff_id int) RETURNS TABL
         last_accessed timestamp,
         sliding_windows_operation int,
         file_name text,    
-        min_x double precision,
-        min_y double precision,
-        max_x double precision,
-        max_y double precision
+        bounding_box text
     ) LANGUAGE plpgsql AS $$ BEGIN -- Select latest code files. Because of the serial nature of submissionID, we can use max(subid) to 
     -- find the latest submission.
     RETURN QUERY
@@ -22,10 +21,7 @@ SELECT image_meta_data.meta_id,
     image_meta_data.last_accessed,
     image_meta_data.sliding_windows_operation,
     image_meta_data.file_name,
-    image_meta_data.min_x,
-    image_meta_data.min_y,
-    image_meta_data.max_x,
-    image_meta_data.max_y
+    ST_asgeojson(image_meta_data.bounding_box)
 FROM image_meta_data
 WHERE image_meta_data.tiff_image_id = tiff_id;
 end;

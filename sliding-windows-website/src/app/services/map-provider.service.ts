@@ -57,8 +57,9 @@ export class MapProviderService {
         }
         this.map.addLayer(newLayer)
         this.currTiffLayer = newLayer
-        let ltlng: L.LatLngBoundsExpression = [[res.min_y, res.min_x], [res.max_y, res.max_x]]
-        this.map.fitBounds(ltlng)
+        let layer = L.geoJSON()
+        layer.addData(res.bounding_box)
+        this.map.fitBounds(layer.getBounds())
       }
 
     })

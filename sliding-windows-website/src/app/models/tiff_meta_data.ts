@@ -1,3 +1,7 @@
+import { BoundingBox } from "./bounding_box";
+import { geoJSON } from "leaflet"
+
+
 export interface TiffMetaData {
     created_date: Date;
     file_name: string;
@@ -7,8 +11,5 @@ export interface TiffMetaData {
     tiff_image_id: number,
     tiff_sha_256: string,
     window_size: number,
-    min_x: number,
-    min_y: number,
-    max_x: number,
-    max_y: number
+    bounding_box: GeoJSON.GeoJsonObject
 }
