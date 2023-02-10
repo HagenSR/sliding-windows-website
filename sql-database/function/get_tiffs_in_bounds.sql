@@ -1,4 +1,11 @@
-CREATE FUNCTION api_functions.get_tiffs_in_bounds(
+-- DROP FUNCTION api_functions.get_tiffs_in_bounds(
+--     min_x double precision,
+--     min_y double precision,
+--     max_x double precision,
+--     max_y double precision
+-- );
+
+CREATE OR REPLACE FUNCTION api_functions.get_tiffs_in_bounds(
     min_x double precision,
     min_y double precision,
     max_x double precision,
@@ -12,7 +19,7 @@ CREATE FUNCTION api_functions.get_tiffs_in_bounds(
     last_accessed timestamp,
     sliding_windows_operation int,
     file_name text,
-    geo_json text
+    bounding_box text
 ) LANGUAGE plpgsql AS $$ BEGIN RETURN QUERY
 SELECT image_meta_data.meta_id,
     image_meta_data.tiff_sha_256,

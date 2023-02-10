@@ -67,7 +67,7 @@ class DataAccess:
         results = self.execute_query(
             "SELECT (api_functions.get_tiffs_in_bounds(%s, %s, %s, %s)).*", (min_x, min_y, max_x, max_y), "fetchall")
         for res in results:
-            res["geo_json"] = json.loads(res["geo_json"])
+            res["bounding_box"] = json.loads(res["bounding_box"])
         return results
 
     def retrieve_tiff(self, img_id):

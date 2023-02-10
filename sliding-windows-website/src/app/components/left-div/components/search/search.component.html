@@ -1,0 +1,8 @@
+<button (click)="search()">Search current area</button>
+<hr>
+<div class = "container" style="overflow-y:scroll; max-height: 85vh;">
+    <div *ngFor="let meta of tiffMetaData" >
+        <app-search-result [metaData]="meta"></app-search-result>
+        <hr>
+    </div>
+</div>

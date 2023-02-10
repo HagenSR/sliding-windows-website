@@ -61,7 +61,12 @@ export class MapProviderService {
         layer.addData(res.bounding_box)
         this.map.fitBounds(layer.getBounds())
       }
-
+      
     })
   }
+
+  getBounds() : L.LatLngBounds{
+    return this.map.getBounds()
+  }
+
 }
