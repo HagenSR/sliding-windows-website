@@ -42,7 +42,7 @@ class DataAccess:
         query = "SELECT api_functions.check_for_geotiff(%s, %s, %s)"
         args = (file_sha_256, win_size, op_id)
         res = self.execute_query(query, args, "fetchone")
-        return res["check_for_geotiff"] 
+        return res["check_for_geotiff"]
 
     def insert(self, file_bytea, hash, win_size, op_id, file_name, bounds):
         res = None
@@ -61,6 +61,14 @@ class DataAccess:
             "SELECT (api_functions.get_meta_data(%s)).*", (met_id,), "fetchone")
         res["bounding_box"] = json.loads(res["bounding_box"])
         return res
+
+    def get_tiffs_inside_bounds(self, min_x, min_y, max_x, max_y):
+        results = None
+        results = self.execute_query(
+            "SELECT (api_functions.get_tiffs_in_bounds(%s, %s, %s, %s)).*", (min_x, min_y, max_x, max_y), "fetchall")
+        for res in results:
+            res["geo_json"] = json.loads(res["geo_json"])
+        return results
 
     def retrieve_tiff(self, img_id):
         res = None

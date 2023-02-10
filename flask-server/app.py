@@ -93,6 +93,15 @@ def get_meta_data():
     res = dataAccess.get_meta_data(img_id)
     return jsonify(res)
 
+@app.route("/get_tiffs_inside_bounds")
+def get_tiffs_inside_bounds():
+    min_x = request.args.get('min_x')
+    min_y = request.args.get('min_y')
+    max_x = request.args.get('max_x')
+    max_y = request.args.get('max_y')
+    res = dataAccess.get_tiffs_inside_bounds(min_x, min_y, max_x, max_y)
+    return jsonify(res)
+
 
 @app.route("/get_operations")
 def get_ops():
