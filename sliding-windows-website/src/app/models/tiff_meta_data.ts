@@ -1,4 +1,3 @@
-import { BoundingBox } from "./bounding_box";
 import { geoJSON } from "leaflet"
 
 
