@@ -70,7 +70,7 @@ export class TiffService {
           return true;
         },
         error: (err) => {
-          alert("Upload tiff file failed: " + err.error.error);
+          alert("Upload tiff file failed: " + (err.error.error ?? err.error));
           return false;
         }
       })

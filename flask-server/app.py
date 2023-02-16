@@ -8,6 +8,7 @@ from werkzeug.utils import secure_filename
 from windowagg.sliding_window import SlidingWindow
 from dataAccess import DataAccess
 from werkzeug.exceptions import HTTPException
+from rasterio.warp import calculate_default_transform, reproject, Resampling
 
 app = Flask(__name__)
 CORS(app)
@@ -50,13 +51,14 @@ def insert_tiff():
         # If the user does not select a file, the browser submits an
         # empty file without a filename.
         filename = ""
-        meta_data_to_return = "File not allowed", 400
+        meta_data_to_return = "Only .tif files are allowed", 400
         if file.filename == '':
             return 'No file selected', 400
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
             filename = os.path.join(app.config['UPLOAD_FOLDER'], filename)
             file.save(filename)
+            filename = reproj(filename)
             hash = ""
             with open(filename, "rb") as fl:
                 hash = hashlib.sha256(fl.read())
@@ -71,8 +73,35 @@ def insert_tiff():
                 id = dataAccess.insert(byte_string, hash.hexdigest(), win_size, op_id, new_file_name, bounds)
                 os.remove(new_file_name)
                 meta_data_to_return = jsonify(dataAccess.get_meta_data(id["insert_geotiff"])), 200
-        os.remove(filename)
+            os.remove(filename)
         return meta_data_to_return
+    
+def reproj(filepath):
+    dst_crs = 'EPSG:4326'
+    with rasterio.open(filepath) as src:
+        if src.crs == 4326:
+            return filepath
+        transform, width, height = calculate_default_transform(
+            src.crs, dst_crs, src.width, src.height, *src.bounds)
+        kwargs = src.meta.copy()
+        kwargs.update({
+            'crs': dst_crs,
+            'transform': transform,
+            'width': width,
+            'height': height
+        })
+
+        with rasterio.open(f"{filepath}", 'w', **kwargs) as dst:
+            for i in range(1, src.count + 1):
+                reproject(
+                    source=rasterio.band(src, i),
+                    destination=rasterio.band(dst, i),
+                    src_transform=src.transform,
+                    src_crs=src.crs,
+                    dst_transform=transform,
+                    dst_crs=dst_crs,
+                    resampling=Resampling.nearest)
+        return f"{filepath}_4326"
 
 
 # Returns tiff image as array of bytes
