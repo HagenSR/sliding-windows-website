@@ -101,7 +101,7 @@ def reproj(filepath):
                     dst_transform=transform,
                     dst_crs=dst_crs,
                     resampling=Resampling.nearest)
-        return f"{filepath}_4326"
+        return f"{filepath}"
 
 
 # Returns tiff image as array of bytes
