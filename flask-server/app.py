@@ -18,20 +18,24 @@ dataAccess = DataAccess()
 
 op_id_to_desc = DataAccess.arrayToDict(dataAccess.get_operations())
 
+
 @app.errorhandler(Exception)
 def handle_exception(e):
     return jsonify(error=str(e)), 404
+
 
 @app.route("/")
 def hello_world():
     return "<p>Hello, World!</p>"
 
+
 @app.route("/check_for_tiff")
 def check_for_tiff():
     file_sha_256 = request.args.get('file_sha256')
     win_size = request.args.get('win_size')
+    d_type = request.args.get('d_type')
     op_id = request.args.get('op_id')
-    return jsonify(dataAccess.check(file_sha_256, win_size, op_id))
+    return jsonify(dataAccess.check(file_sha_256, win_size, d_type, op_id))
 
 
 def allowed_file(filename):
@@ -62,20 +66,25 @@ def insert_tiff():
             hash = ""
             with open(filename, "rb") as fl:
                 hash = hashlib.sha256(fl.read())
-            id = dataAccess.check(hash.hexdigest(), win_size, op_id)
+            id = dataAccess.check(hash.hexdigest(), win_size, dtype, op_id)
             if id:
-                meta_data_to_return = jsonify(dataAccess.get_meta_data(id)), 200
+                meta_data_to_return = jsonify(
+                    dataAccess.get_meta_data(id)), 200
             else:
-                new_file_name, bounds = execute_sliding_windows(filename, win_size, op_id, dtype)
+                new_file_name, bounds = execute_sliding_windows(
+                    filename, win_size, op_id, dtype)
                 byte_string = ""
                 with open(new_file_name, "rb") as fl:
                     byte_string = fl.read()
-                id = dataAccess.insert(byte_string, hash.hexdigest(), win_size, op_id, new_file_name, bounds)
+                id = dataAccess.insert(byte_string, hash.hexdigest(
+                ), win_size, dtype, op_id, new_file_name, bounds)
                 os.remove(new_file_name)
-                meta_data_to_return = jsonify(dataAccess.get_meta_data(id["insert_geotiff"])), 200
+                meta_data_to_return = jsonify(
+                    dataAccess.get_meta_data(id["insert_geotiff"])), 200
             os.remove(filename)
         return meta_data_to_return
-    
+
+
 def reproj(filepath):
     dst_crs = 'EPSG:4326'
     with rasterio.open(filepath) as src:
@@ -129,23 +138,23 @@ def get_ops():
     return jsonify(res)
 
 
-def execute_sliding_windows(filePath, win_size, operation, dtype : str):
+def execute_sliding_windows(filePath, win_size, operation, dtype: str):
     new_file_name = ""
     with SlidingWindow(filePath, dtype=getattr(rasterio, dtype)) as slide_window:
         # slide_window.auto_plot = self.auto_plot
         slide_window.initialize_dem()
         slide_window.aggregate_dem(win_size)
-        if op_id_to_desc[operation] == "dem_slope": 
+        if op_id_to_desc[operation] == "dem_slope":
             new_file_name = slide_window.dem_slope()
-        elif op_id_to_desc[operation] == "dem_profile": 
+        elif op_id_to_desc[operation] == "dem_profile":
             new_file_name = slide_window.dem_profile()
-        elif op_id_to_desc[operation] == "dem_tangential": 
+        elif op_id_to_desc[operation] == "dem_tangential":
             new_file_name = slide_window.dem_tangential()
-        elif op_id_to_desc[operation] == "dem_contour": 
+        elif op_id_to_desc[operation] == "dem_contour":
             new_file_name = slide_window.dem_contour()
-        elif op_id_to_desc[operation] == "dem_proper_profile": 
+        elif op_id_to_desc[operation] == "dem_proper_profile":
             new_file_name = slide_window.dem_proper_profile()
-        elif op_id_to_desc[operation] == "dem_proper_tangential": 
+        elif op_id_to_desc[operation] == "dem_proper_tangential":
             new_file_name = slide_window.dem_proper_tangential()
         else:
             raise Exception("Invalid operation")

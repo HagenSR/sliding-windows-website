@@ -16,7 +16,7 @@ export class FileUploadComponent implements OnInit {
     file: new FormControl<File | null>(null, [
       Validators.required,
     ]),
-    windowSize: new FormControl<number | null>(null,[
+    windowSize: new FormControl<number | null>(null, [
       Validators.required,
       Validators.min(1)
     ]),
@@ -38,17 +38,23 @@ export class FileUploadComponent implements OnInit {
     }
   }
 
-  // On file Select
-  // onChange(event : any) {
-  //   this.file = event.target.files[0];
-  // }
 
   onSubmit() {
     if (this.fileUploadForm.invalid) {
       alert("Cannot insert invalid data. Please read the advice below of the input boxes")
     } else {
-      this.tiffService.insertTiff(this.fileUploadForm.get("file")!.value!, this.fileUploadForm.get("windowSize")!.value!,
-        this.fileUploadForm.get("operation")!.value!, this.fileUploadForm.get("dtype")!.value!).then(res => console.log(this.tiffService.tiffMetaData.value))
+      let tiff_file = this.fileUploadForm.get("file")!.value!;
+      let win_size = this.fileUploadForm.get("windowSize")!.value!;
+      let op = this.fileUploadForm.get("operation")!.value!;
+      let dtype = this.fileUploadForm.get("dtype")!.value!;
+      this.tiffService.checkIfTiffExists(tiff_file, win_size, op, dtype).then((res) => {
+        if (res) {
+          this.tiffService.getTiffMeta(res)
+        } else {
+          this.tiffService.insertTiff(tiff_file, win_size, op, dtype)
+            .then((res) => { })
+        }
+      })
     }
   }
 

@@ -1,9 +1,9 @@
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import GeoTIFF, { fromBlob } from 'geotiff';
 import { BehaviorSubject, Observable, of } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { TiffMetaData } from '../models/tiff_meta_data';
+import * as crypto from 'crypto-js';
 
 const httpOptions = {
   headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
@@ -28,12 +28,33 @@ export class TiffService {
     })
   }
 
+  checkIfTiffExists(file: File, win_size: number, op_id: number, dtype: string): Promise<number> {
+    return new Promise((resolve, rej) => {
+      this.readFile(file).then((hash) => {
+        var params = new HttpParams();
+        params = params.append("file_sha256", hash)
+        params = params.append("win_size", win_size)
+        params = params.append("d_type", dtype)
+        params = params.append("op_id", op_id)
+        httpOptions.params = params
+        this.http.get<number>(environment.ApiURL + 'check_for_tiff', httpOptions).subscribe((res) => {
+          resolve(res);
+        });
+      })
+    })
 
-  checkIfTiffExists(tiff_sha256: string): Observable<boolean> {
-    var params = new HttpParams();
-    params = params.append("file_sha256", tiff_sha256)
-    httpOptions.params = params
-    return this.http.get<boolean>(environment.ApiURL + 'check_for_tiff', httpOptions);
+
+  }
+
+  readFile(file: File): Promise<string> {
+    return new Promise((resolve, rej) => {
+      let reader = new FileReader()
+      reader.onload = () => {
+        let hash = crypto.SHA256(crypto.enc.Latin1.parse(reader.result?.toString()!)).toString(crypto.enc.Hex)
+        resolve(hash)
+      }
+      reader.readAsBinaryString(file)
+    })
   }
 
   retrieveTiff(img_id: number): void {
@@ -47,6 +68,21 @@ export class TiffService {
       }
 
     })
+  }
+
+  getTiffMeta(img_id: number): void {
+    var params = new HttpParams();
+    params = params.append("img_id", img_id);
+    httpOptions.params = params
+    this.http.get<TiffMetaData>(environment.ApiURL + 'get_meta_data', httpOptions).subscribe({
+      next: (res) => {
+        this.tiffMetaData.next(res);
+      },
+      error: (err) => {
+        alert("Tiff Meta data fetch fail: " + (err.error.error ?? err.error));
+      }
+    })
+
   }
 
   insertTiff(file: File, win_size: number, op_id: number, dtype: string): Promise<Boolean> {
@@ -88,10 +124,4 @@ export class TiffService {
     return ab;
   }
 
-  // convertToJPG(blob: Blob) {
-  //   blob.arrayBuffer().then((arrBuf) => {
-  //     let res = decode(arrBuf)
-  //     console.log("huh")
-  //   })
-  // }
 }
