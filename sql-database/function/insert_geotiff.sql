@@ -4,6 +4,7 @@ CREATE OR REPLACE FUNCTION api_functions.insert_geotiff(
         image_base64 bytea,
         image_sha text,
         win_size int,
+        d_type text,
         oper_id int,
         file_name text,
         min_x numeric,
@@ -20,6 +21,7 @@ INSERT INTO image_meta_data(
         tiff_sha_256,
         tiff_image_id,
         window_size,
+        dtype,
         sliding_windows_operation,
         file_name,
         bounding_box
@@ -28,6 +30,7 @@ VALUES (
         image_sha,
         image_id,
         win_size,
+        d_type,
         oper_id,
         file_name,
         ST_MakeEnvelope(
@@ -45,6 +48,7 @@ ALTER FUNCTION api_functions.insert_geotiff(
     bytea,
     text,
     int,
+    text,
     int,
     text,
     numeric,
