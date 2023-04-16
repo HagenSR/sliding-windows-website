@@ -4,7 +4,7 @@
       <mat-card-title>{{metaData.file_name}}</mat-card-title>
     </mat-card-header>
     <mat-card-content>
-        <p>Operation: {{metaData.sliding_windows_operation}}</p>
+        <p>Operation: {{metaData.sliding_windows_operation | operationIdToDesc}}</p>
         <p>Window Size: {{metaData.window_size}}</p>
         <p>Created Date: {{metaData.created_date}}</p>
         <hr>

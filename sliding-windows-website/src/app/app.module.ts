@@ -14,6 +14,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatCardModule } from '@angular/material/card'
 import { SearchResultComponent } from './components/left-div/components/search-result/search-result.component';
+import { OperationIdToDescPipe } from './pipes/operation-id-to-desc.pipe';
 
 @NgModule({
   declarations: [
@@ -23,7 +24,8 @@ import { SearchResultComponent } from './components/left-div/components/search-r
     FileUploadComponent,
     FileDownloadComponent,
     SearchComponent,
-    SearchResultComponent
+    SearchResultComponent,
+    OperationIdToDescPipe
   ],
   imports: [
     BrowserModule,

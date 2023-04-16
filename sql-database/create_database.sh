@@ -8,6 +8,7 @@ psql sliding_windows_website -f other/create_index.sql
 psql sliding_windows_website -f other/create_schema.sql
 psql sliding_windows_website -f function/check_for_geotiff.sql
 psql sliding_windows_website -f function/insert_geotiff.sql
+psql sliding_windows_website -f function/get_tiffs_in_bounds.sql
 psql sliding_windows_website -f function/retrieve_tiff.sql
 psql sliding_windows_website -f function/get_meta_data.sql
 psql sliding_windows_website -f function/get_operations.sql
